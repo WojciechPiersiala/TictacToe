@@ -46,7 +46,7 @@ def actions(board):
     myList = []
     for i in range(0,3):
         for j in range(0,3):
-            if board[i][j] is not None:
+            if board[i][j] is EMPTY:
                 val = (i,j)   
                 myList.append(val)
     return myList
@@ -110,37 +110,52 @@ def utility(board):
     else:
         return 0
 
-
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    freePositions = []
-    aiPlayer = player(board)
+    freePositions = actions(board)
+    currentPlayer = player(board)
+    freeLen = len(freePositions)
+    if freeLen == 9:
+        x_pos = 0
+        y_pos = 0
+
+        while (board[x_pos][y_pos] is not None): 
+            x_pos = random.randint(0,2)
+            y_pos = random.randint(0,2)
+        return(x_pos,y_pos)
     
+    if currentPlayer == X:
+        best = [None, None, -100]
+    else:
+        best = [None, None, 100]
     
-    for i in range(0,3):
-        for j in range(0,3):
-            if board[i][j] is None:
-                pos = (i,j)
-                freePositions.append(pos)    
-    maxDepth = len(freePositions)
-    
-    print("outsice : " , maxDepth)
-    if maxDepth == 0 or terminal(board):
-        return utility(board)
-    display_board(board)
+    if freeLen == 0 or terminal(board):
+        score = utility(board)
+        return [None, None, score]
+    # display_board(board)
     
     
     for freeCell in freePositions:
         tmpX = freeCell[0]
         tmpY = freeCell[1]
-        print(maxDepth, tmpX, tmpY)
-        board[tmpX][tmpX] = player(board)
+        board[tmpX][tmpY] = currentPlayer
         result = minimax(board)
-        # board[tmpX][tmpX] = None
+        board[tmpX][tmpY] = None
+        result[0]=tmpX
+        result[1]=tmpY
+
+        if currentPlayer == X:
+            if result[2] > best[2]:
+                best = result #max bal
+        else :
+            if result[2] < best[2]:
+                best = result #min val
+    return best
+    
+            
         
-    print("\n")
     
     
 
